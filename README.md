@@ -4,28 +4,24 @@ This script automates the batch processing of georeferenced, time-series coral r
 - Automatic generation of 3D models and mosaics
 - Handling of batch processing
 - Logging of processing steps and results
-- Integration with external libraries such as html2text
 
 ## Overview
 ### Batch Processing Flow Diagram
 ```mermaid
 graph TD
-    A[Start] --> B[Set Paths and Initial Parameters]
-    B --> C[Get Photo List root_path]
-    C --> D[Find Marker label chunk]
-    D --> E[MetashapeProcess]
-
-    subgraph Processing Steps
-        E --> F[Step 1: Create psx file and files folder]
-        F --> G[Step 2: Add Photos, Match Photos, and Align Cameras]
-        G --> H[Step 3: Generate Sparse Point Cloud]
-        H --> I[Step 4: Generate Dense Point Cloud]
-        I --> J[Step 5: Generate Model Mesh]
-        J --> K[Step 6: Generate Texture]
-        K --> L[Step 7: Export Results Orthomosaic DEM]
+    A[Start - Set Paths and Initial Parameters] --> B[Generate Photo List]
+    B --> C[Find Marker]
+    C --> D[MetashapeProcess]
+    subgraph _
+        D --> E[Step 1: Initialize - Create Products folder, psx file and s]
+        E --> F[Step 2: Add, Match, and Align Photos]
+        F --> G[Step 3: Generate Sparse Point Cloud]
+        G --> H[Step 4: Scaling Process]
+        H --> I[Step 5: Reprojection]
+        I --> J[Step 6: Generate Dense Point Cloud]
+        J --> K[Step 7: Export Results Orthomosaic DEM]
     end
-
-    L --> M[End]
+    K --> L[End]
 
     style A fill:#f9f,stroke:#333,stroke-width:2px
     style B fill:#bbf,stroke:#333,stroke-width:2px
@@ -39,7 +35,6 @@ graph TD
     style J fill:#9ff,stroke:#333,stroke-width:2px
     style K fill:#fc6,stroke:#333,stroke-width:2px
     style L fill:#f96,stroke:#333,stroke-width:2px
-    style M fill:#6f9,stroke:#333,stroke-width:2px
 
 ```
 ## Installation

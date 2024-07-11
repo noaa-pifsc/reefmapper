@@ -1,6 +1,6 @@
 # Auto batch process for Agisoft Metashape
 # Following Structure-from-Motion workflow
-#
+# M. Akridge, 2024/07/11
 # F. Lichowski, 2024/07/10
 #
 ################################################################################################
@@ -11,7 +11,9 @@ import json
 import math
 import Metashape
 import shutil
-sys.path.insert(0, 'M:\\FL_test\\Scripts\\') # path where html2text folder resides
+# path where html2text folder resides
+# sys.path.insert(0, 'M:\\FL_test\\Scripts\\') 
+# pip install html2text
 import html2text
               
 ################################################################################################  

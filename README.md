@@ -71,7 +71,9 @@ python SfMBatchProcess_1_1.py
 - logging (in database?)
     - email status and reports?
     - verify status checks? (files, sizes, and so on?)
-- add a retry loop in case of failure
+- add a retry loop in case of failure if possible given the data status
+- summary report: links to all important files generated
+- add cleanup step? to clear out un-needed files after processing?
 
 Extra:
 - ArcGIS integration via python

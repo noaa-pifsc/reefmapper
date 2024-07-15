@@ -74,6 +74,7 @@ python SfMBatchProcess_1_1.py
 - add a retry loop in case of failure if possible given the data status
 - summary report: links to all important files generated
 - add cleanup step? to clear out un-needed files after processing?
+- concurrent futures for some steps?
 
 Extra:
 - ArcGIS integration via python

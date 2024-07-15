@@ -59,6 +59,16 @@ Run the Script using Python
 python SfMBatchProcess_1_1.py
 ```
 
+## Ideas 
+- database integration?
+- - to take advantage of QA/QC and eliminate errors
+- - automatically check flags as steps finish
+- logging
+- add a retry loop in case of failure
+- logging into the database?
+- add in SAM step for auto mask using taglab code and/or SAM model
+
+
 ### License
 See the [LICENSE.md](./LICENSE.md) for details
 

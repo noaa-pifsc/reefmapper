@@ -67,7 +67,8 @@ python SfMBatchProcess_1_1.py
 - add a retry loop in case of failure
 - logging into the database?
 - add in SAM step for auto mask using taglab code and/or SAM model
-
+- email status and reports?
+- verify status checks? (files, sizes, and so on?)
 
 ### License
 See the [LICENSE.md](./LICENSE.md) for details

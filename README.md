@@ -5,7 +5,10 @@ This script automates the batch processing of georeferenced, time-series coral r
 - Handling of batch processing
 - Logging of processing steps and results
 
+<img src="./docs/s01.png" />
+
 ## Overview
+
 ### Batch Processing Flow Diagram
 ```mermaid
 graph TD
@@ -69,6 +72,12 @@ python SfMBatchProcess_1_1.py
 - add in SAM step for auto mask using taglab code and/or SAM model
 - email status and reports?
 - verify status checks? (files, sizes, and so on?)
+  
+### Reference 
+- https://agisoft.freshdesk.com/support/solutions/articles/31000148930-how-to-install-metashape-stand-alone-python-module
+- https://www.agisoft.com/pdf/metashape_python_api_2_0_0.pdf
+
+- https://github.com/agisoft-llc/metashape-scripts/tree/master
 
 ### License
 See the [LICENSE.md](./LICENSE.md) for details

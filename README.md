@@ -63,15 +63,20 @@ python SfMBatchProcess_1_1.py
 ```
 
 ## Ideas 
-- database integration?
-- - to take advantage of QA/QC and eliminate errors
-- - automatically check flags as steps finish
-- logging
+- database/mission app integration | semi-done metadata integration 
+    - take advantage of QA/QC and eliminate errors
+     - to do: - automatically check flags as steps finish
+- logging (in database?)
+    - email status and reports?
+    - verify status checks? (files, sizes, and so on?)
 - add a retry loop in case of failure
-- logging into the database?
-- add in SAM step for auto mask using taglab code and/or SAM model
-- email status and reports?
-- verify status checks? (files, sizes, and so on?)
+
+Extra:
+- ArcGIS integration via python
+ - to create project and import files?
+ - link geodatabase?
+ - start mission app annotation steps
+- add in SAM step for auto mask using taglab code and/or SAM model?
   
 ### Reference 
 - https://agisoft.freshdesk.com/support/solutions/articles/31000148930-how-to-install-metashape-stand-alone-python-module

@@ -65,7 +65,9 @@ python SfMBatchProcess_1_1.py
 ## Ideas 
 - database/mission app integration | semi-done metadata integration 
     - take advantage of QA/QC and eliminate errors
-     - to do: - automatically check flags as steps finish
+     - to do:
+     - - automatically check flags as steps finish
+       - Parsing Log files via uploader for quick checks?
 - logging (in database?)
     - email status and reports?
     - verify status checks? (files, sizes, and so on?)

@@ -61,7 +61,18 @@ Run the Script using Python
 ```
 python SfMBatchProcess_1_1.py
 ```
-
+## Issues
+path issues
+- need: better qc for dataentry and the app for final file
+- maybe pull imagery from cloud for processing and reupload the files?
+code issues
+- modificaions of py fil
+- have git pull/read only
+qa/ section - faq 
+data file structure 
+code editor: 
+- https://code.visualstudio.com/
+****
 ## Ideas 
 - database/mission app integration | semi-done metadata integration 
     - take advantage of QA/QC and eliminate errors

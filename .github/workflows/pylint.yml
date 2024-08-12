@@ -19,5 +19,5 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint _orginal/SfMBatchProcess_1_1.py.py
+        pylint ./_orginal/SfMBatchProcess_1_1.py.py
 # pylint $(git ls-files '*_orginal/SfMBatchProcess_1_1.py.py')

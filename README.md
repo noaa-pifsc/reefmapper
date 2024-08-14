@@ -1,6 +1,6 @@
 # Reef Mapper | NCRMP Structure-from-Motion workflow
 This script automates the batch processing of georeferenced, time-series coral reef photomosaics using Agisoft Metashape. It follows the Structure-from-Motion (SfM) workflow to generate 3D models and mosaics from photographic images of coral reefs. The script is designed to handle large datasets and streamline the processing pipeline for efficient monitoring and analysis. It includes functions for reading image files, processing them using Agisoft Metashape, and logging the processing details. Key features include:
-
+- test
 - Automatic generation of 3D models and mosaics
 - Handling of batch processing
 - Logging of processing steps and results

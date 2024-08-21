@@ -74,6 +74,9 @@ code editor:
 - https://code.visualstudio.com/
 ****
 ## Ideas 
+
+20240821 - use SFM OV app for metadata that can be QC-ed and solve path issues
+
 - database/mission app integration | semi-done metadata integration 
     - take advantage of QA/QC and eliminate errors
      - to do:

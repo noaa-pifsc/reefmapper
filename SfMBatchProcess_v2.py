@@ -1,8 +1,7 @@
 # Auto batch process for Agisoft Metashape
 # Following Structure-from-Motion workflow
 #
-# F. Lichowski, 2024/07/30
-# M. Akrdige, 2024/10/02
+# Author(s): F. Lichowski, M. Akrdige, D. Torres-Pulliza
 #
 # 20241002 - Changelog - Updates to match Metashape Python API updates
 # Changes as follows:  
@@ -10,8 +9,15 @@
 #     PointCloud to TiePoints
 #     point_cloud to tie_points
 #     buildDenseCloud to buildPointCloud
+#
+# 20241210 - Changelog - Updates to match Metashape Python API updates
+# Changes to Step7 as follows (other changes needed for previous steps): 
+#     Chunk.exportPoints() to exportPointCloud()
+#     DataSource.DenseCloudData to DataSource.PointCloudData
+#     	
 # reference: https://www.agisoft.com/forum/index.php?topic=9578.15
 #            https://github.com/gisportsmouth/Agisoft-Metashape-Automation-Script
+#            https://www.agisoft.com/pdf/metashape_python_api_2_1_0.pdf
 ################################################################################################
 import os
 import sys
@@ -20,12 +26,12 @@ import json
 import math
 import Metashape
 import shutil
-sys.path.insert(0, 'M:\\Sfm_Processing_Automation\\Scripts') # path where html2text folder resides
+# Example: sys.path.insert(0, 'C:/Your/Scripts/Path') # path where html2text folder resides
 import html2text
               
 ################################################################################################  
 # set path and filename of processing log (as text string)
-process_log = 'N:\\Fixed_Sites\\MHI\\Fixed_Sites_2024_ProcessingLog_V1.csv'
+process_log = 'C:/Your/ProcessingLog.csv' # Update with your processing log path
 batch_no = 1 # set number of batch to be processed (1-n)
 
 ################################################################################################  
@@ -418,9 +424,10 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         # change buildDenseCloud to buildPointCloud
         chunk.buildPointCloud(point_colors=True, point_confidence=True)
         # select points to remove (0-1 confidence)
-        chunk.dense_cloud.setConfidenceFilter(0, 1)
-        chunk.dense_cloud.removePoints(list(range(128))) # removes all "visible" points of dense cloud
-        chunk.dense_cloud.resetFilters()
+	# dense cloud from chunk.dense_cloud to chunk.point_cloud
+        chunk.point_cloud.setConfidenceFilter(0, 1)
+        chunk.point_cloud.removePoints(list(range(128))) # removes all "visible" points of dense cloud
+        chunk.point_cloud.resetFilters()
         
         # Add depth and rectify model
         # DONE MANUALLY (for now, could easily be read from the processing log)
@@ -428,7 +435,7 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         doc.save()
     print("Step 6.Build Dense Cloud complete") 
     #==============================================================================================
-    ### 7) Build and export DEM and Orthomosaic, generate report
+   ### 7) Build and export DEM and Orthomosaic, generate report
     print("Step 7. Build and export DEM and Orthomosaic and generate report")  
     if start_step==7:
         print('Step 7')
@@ -441,7 +448,8 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
             pass 
                                  
         # build DEM using all defaults
-        chunk.buildDem(source_data=Metashape.DenseCloudData)
+        # Renamed DataSource.DenseCloudData enum value to DataSource.PointCloudData
+        chunk.buildDem(source_data=Metashape.PointCloudData)
         
         # build Orthomosaic  
         chunk.buildOrthomosaic(surface_data=Metashape.ElevationData, fill_holes=True, 
@@ -521,7 +529,9 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         # export point cloud
         pt_file = os.path.join(prod_path, folder_name+'.ply')
         if os.path.isfile(pt_file)==False:
-            chunk.exportPoints(pt_file, source_data = Metashape.DenseCloudData)
+        #Renamed DataSource.DenseCloudData enum value to DataSource.PointCloudData
+        #Renamed Chunk.exportPoints() method to exportPointCloud()
+            chunk.exportPointCloud(pt_file, source_data = Metashape.PointCloudData) 
        
     #==============================================================================================
     # Save the project 
@@ -542,7 +552,7 @@ with open(os.path.join(r''+process_log), newline='') as csvfile:
             if os.path.exists(fpath):
                 quality_thres = float(col[9]) # image quality threshold 
                 sur_year = str(col[10]) # survey year for export
-                for r in range(5, 9): # make list of valid markers from column F-I
+                for r in range(5, 8): # make list of valid markers from column F-I 9>8, 
                     if col[r] != 'NA':
                         t1, t2 = col[r].split(',')
                         ml.append('target '+t1.strip())

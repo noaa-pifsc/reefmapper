@@ -1,8 +1,7 @@
 # Auto batch process for Agisoft Metashape
 # Following Structure-from-Motion workflow
 #
-# F. Lichowski, 2024/07/10
-#
+# Author(s): F. Lichowski
 ################################################################################################
 import os
 import sys
@@ -11,12 +10,12 @@ import json
 import math
 import Metashape
 import shutil
-sys.path.insert(0, 'M:\\FL_test\\Scripts\\') # path where html2text folder resides
+sys.path.insert(0, 'C:/Your/Scripts/Path/') # path where html2text folder resides
 import html2text
               
 ################################################################################################  
 # set path and filename of processing log (as text string)
-process_log = 'N:\StRS_Sites\2024\MP2404_MHI\OAH\StRS_Sites_2024_ProcessingLog_V1.csv'
+process_log = 'C:/Your/ProcessingLog.csv' # Update with your processing log path
 batch_no = 1 # set number of batch to be processed (1-n)
 
 ################################################################################################  

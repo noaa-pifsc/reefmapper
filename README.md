@@ -1,9 +1,16 @@
-# Reef Mapper | NCRMP Structure-from-Motion workflow
-This script automates the batch processing of georeferenced, time-series coral reef photomosaics using Agisoft Metashape. It follows the Structure-from-Motion (SfM) workflow to generate 3D models and mosaics from photographic images of coral reefs. The script is designed to handle large datasets and streamline the processing pipeline for efficient monitoring and analysis. It includes functions for reading image files, processing them using Agisoft Metashape, and logging the processing details. Key features include:
-- test
-- Automatic generation of 3D models and mosaics
-- Handling of batch processing
-- Logging of processing steps and results
+# Reef Mapper | NCRMP Structure-from-Motion Workflow Scripts
+
+These scripts automate the batch processing of georeferenced, time-series coral reef photomosaics using Agisoft Metashape. They follow a Structure-from-Motion (SfM) workflow to generate 3D models and mosaics from photographic images of coral reefs, streamlining the processing pipeline for efficient monitoring and analysis.
+
+## Features
+- **Batch Processing:** Automates the full SfM workflow for multiple sites or datasets.
+- **Photo Management:** Reads and validates image files from user-specified directories.
+- **Automated Alignment:** Matches and aligns photos, builds sparse and dense point clouds.
+- **Marker Detection & Scaling:** Detects ground control markers and applies scale bars.
+- **Quality Control:** Filters images and points based on quality metrics.
+- **Export:** Generates and exports DEMs, orthomosaics, and processing reports.
+- **Logging:** Logs all processing steps and results for reproducibility and troubleshooting.
+- **Compatibility:** Two script versions for legacy and current Metashape Python APIs.
 
 <img src="./docs/s01.png" />
 
@@ -39,72 +46,55 @@ graph TD
     style K fill:#fc6,stroke:#333,stroke-width:2px
     style L fill:#f96,stroke:#333,stroke-width:2px
 
-```
-## Installation
-To run this script, you need to have Python and Agisoft Metashape installed on your system. Additionally, you need to install the required Python packages. You can install the necessary packages using the following steps:
-1. Ensure you have Python installed. If not, download and install Python from [python.org](https://www.python.org/).
-2. Install the required packages using `pip`. You can create a `requirements.txt` file with the following content:
-```
-pip install -r requirements.txt
-```
-## Usage
-To use the script, follow these steps:
-Set the Path and Filename for the Processing Log: Update the process_log variable in the script with the path and filename of your processing log CSV file.
-```
-process_log = 'N:\\StRS_Sites\\2024\\MP2404_MHI\\OAH\\StRS_Sites_2024_ProcessingLog_V1.csv'
-```
-Set the Batch Number: Set the batch_no variable to the number of the batch you want to process.
-```
-batch_no = 1  # Set the number of batch to be processed (1-n)
-```
-Run the Script using Python
-```
-python SfMBatchProcess_1_1.py
-```
-## Issues
-path issues
-- need: better qc for dataentry and the app for final file
-- maybe pull imagery from cloud for processing and reupload the files?
-code issues
-- modificaions of py fil
-- have git pull/read only
-qa/ section - faq 
-data file structure 
-code editor: 
-- https://code.visualstudio.com/
-****
-## Ideas 
+``` 
 
-20240821 - use SFM OV app for metadata that can be QC-ed and solve path issues
+## Batch Processing Scripts
 
-- database/mission app integration | semi-done metadata integration 
-    - take advantage of QA/QC and eliminate errors
-     - to do:
-     - - automatically check flags as steps finish
-       - Parsing Log files via uploader for quick checks?
-- logging (in database?)
-    - email status and reports?
-    - verify status checks? (files, sizes, and so on?)
-- add a retry loop in case of failure if possible given the data status
-- summary report: links to all important files generated
-- add cleanup step? to clear out un-needed files after processing?
-- concurrent futures for some steps?
+This repository includes two main batch processing scripts for Agisoft Metashape:
 
-Extra:
-- ArcGIS integration via python
- - to create project and import files?
- - link geodatabase?
- - start mission app annotation steps
-- add in SAM step for auto mask using taglab code and/or SAM model?
-  
-### Reference 
-- https://agisoft.freshdesk.com/support/solutions/articles/31000148930-how-to-install-metashape-stand-alone-python-module
-- https://www.agisoft.com/pdf/metashape_python_api_2_0_0.pdf
+### `SfMBatchProcess_v1.py`
+- **Description:** Original version of the batch processing script.
+- **Compatibility:** Designed for earlier versions of the Metashape Python API.
+- **Usage:** Use if you are working with legacy projects or older Metashape installations.
 
-- https://github.com/agisoft-llc/metashape-scripts/tree/master
+### `SfMBatchProcess_v2.py`
+- **Description:** Updated version with compatibility for recent Metashape Python API changes (see changelog in script header).
+- **Key Updates:**
+  - Uses `chunk.analyzeImages` instead of `chunk.analyzePhotos`.
+  - Uses `TiePoints` instead of `PointCloud` for sparse cloud operations.
+  - Updated export and build function names to match API changes.
+- **Usage:** Recommended for new projects and current Metashape versions.
 
-### License
-See the [LICENSE.md](./LICENSE.md) for details
+## Inputs & Outputs
 
-### Disclaimer
+**Inputs:**
+- A CSV processing log specifying batch/site information.
+- Folders containing site images (JPEG/JPG).
+- (Optional) Ground control marker information.
+
+**Outputs:**
+- Agisoft Metashape project files (.psx and .files).
+- Log and readme text files for each batch.
+- Exported DEMs, orthomosaics, and reports (in supported formats).
+
+
+## Quick Start
+
+1. **Install Agisoft Metashape** (Python API required; see [official instructions](https://agisoft.freshdesk.com/support/solutions/articles/31000148930-how-to-install-metashape-stand-alone-python-module)).
+2. **Prepare your data:** Organize your images and create a processing log CSV.
+3. **Edit the script:** Update the `process_log` and `batch_no` variables in the script to match your data.
+4. **Run the script:**  
+   ```sh
+   python SfMBatchProcess_v2.py
+   ```
+   (or `SfMBatchProcess_v1.py` for legacy workflows)
+
+## References
+- [Agisoft Metashape Python API Documentation](https://www.agisoft.com/pdf/metashape_python_api_2_0_0.pdf)
+- [Metashape Automation Scripts](https://github.com/agisoft-llc/metashape-scripts/tree/master)
+
+## License
+See the [LICENSE.md](./LICENSE.md) for details.
+
+## Disclaimer
 This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All NOAA GitHub project code is provided on an ‘as is’ basis and the user assumes responsibility for its use. Any claims against the Department of Commerce or Department of Commerce bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by the Department of Commerce. The Department of Commerce seal and logo, or the seal and logo of a DOC bureau, shall not be used in any manner to imply endorsement of any commercial product or activity by DOC or the United States Government.

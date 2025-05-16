@@ -26,24 +26,6 @@ import json
 import math
 import Metashape
 import shutil
-import logging
-
-################################################################################################  
-# Setup logging to both file and console
-LOG_FORMAT = '%(asctime)s [%(levelname)s] %(message)s'
-logger = logging.getLogger("reefmapper")
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter(LOG_FORMAT)
-
-# Log to file (overwrites each run)
-file_handler = logging.FileHandler('reefmapper_batch.log', mode='w')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-# Log to console
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
 
 ################################################################################################  
 # set path and filename of processing log (as text string)
@@ -87,9 +69,9 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
                     # sur_year = survey year for export
                     
     #==============================================================================================
-    logger.info(f"Starting batch: {folder_name} (steps {start_step}-{end_step})")
+    ### 1) Initialize
     print("Step 1. Initialize running")  			
-    logger.info("Step 1. Initialize running")
+    # Metashape.app.ConsolePane.clear() # not woking in 1.7.4
     underline = 50*'-'
     
     # construct the document class (with no chunks)
@@ -103,7 +85,6 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         os.mkdir(prod_path)
     except:
         print(prod_path, 'directory already exists')    
-        logger.info(f'{prod_path} directory already exists')
     
     # write log and readme text file with processing information
     Metashape.app.settings.log_enable = True
@@ -112,7 +93,6 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
     
     if start_step==1:
         print('Step 1 new')
-        logger.info('Step 1 new')
         # start new readme file
         opf = open(os.path.join(prod_path, folder_name+'_readme.txt'), 'w')       
 
@@ -120,30 +100,25 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         if os.path.exists(psxfile):
             os.remove(psxfile)
             print('Deleted', psxfile)
-            logger.info(f'Deleted {psxfile}')
             
         # remove log file, if it exists
         if os.path.exists(log_file):          
             os.remove(log_file)
             print('Deleted', log_file)
-            logger.info(f'Deleted {log_file}')
         
         # remove .files folder, if it exists
         file_path = os.path.join(prod_path, folder_name+'.files')
         if os.path.exists(file_path):
             shutil.rmtree(file_path, ignore_errors=True)
             print('Deleted', file_path)
-            logger.info(f'Deleted {file_path}')
                        
         # save .psx file and add new chunk     
         doc.save(psxfile)
         chunk = doc.addChunk()
         print('Saved project to: ' + psxfile)
-        logger.info(f'Saved project to: {psxfile}')
     
     else:
         print('Step 1 existing')
-        logger.info('Step 1 existing')
         # for start_step>1: open existing readme and .psx file and load chunk
         opf = open(os.path.join(prod_path, folder_name+'_readme.txt'), 'a')
         doc.open(psxfile)
@@ -152,13 +127,11 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
     chunk.camera_location_accuracy = Metashape.Vector((0.1, 0.1, 0.15))
     opf.write('Readme file for {0}\n{1}\n'.format(folder_name, underline)) 
     print("Step 1. Initialize Finished")          
-    logger.info("Step 1. Initialize Finished")
     #==============================================================================================
+    ### 2) Add and align photos 
     print("Step 2. Add and align photos ")    
-    logger.info("Step 2. Add and align photos ")
     if start_step<=2 and end_step>=2:
         print('Step 2')
-        logger.info('Step 2')
         opf.write('\nAlign photos\n{0}\n'.format(underline))        
         
         ## get photo list
@@ -169,13 +142,11 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         
         if n == 0:
             print('No photos found in', os.path.join(root_path, extra))
-            logger.warning(f'No photos found in {os.path.join(root_path, extra)}')
             opf.write('No photos found in {0}\n'.format(os.path.join(root_path, extra)))
             return
        
         ## add photos
         print('Adding '+str(n)+' photos')
-        logger.info(f'Adding {n} photos')
         opf.write('Adding '+str(n)+' photos\n')
         chunk.addPhotos(photoList) 
 
@@ -189,13 +160,11 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
                 quality_log[qc] = 1
                 camera.enabled = False
                 print(qc, camera.label, float(camera.meta['Image/Quality'])) 
-                logger.info(f'Image {camera.label} with quality {float(camera.meta["Image/Quality"]):.3f} disabled')
                 opf.write('Image {0} with quality {1:.3f} disabled\n'.format(
                                 camera.label, float(camera.meta['Image/Quality'])))
         n_enabled = n-bad_quality
         print(str(bad_quality)+' photo(s) ('+str(round(bad_quality/n*100,1))+ \
               '%) of quality below '+str(quality))                 
-        logger.info(f'{bad_quality} photo(s) ({round(bad_quality/n*100,1)}%) of quality below {quality}')
         opf.write(str(bad_quality)+' photo(s) ('+str(round(bad_quality/n*100,1))+ \
               '%) of quality below '+str(quality)+'\n')         
         print(quality_log)
@@ -215,17 +184,13 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
                 counter += 1
         print('Enabled images: {0} '.format(n_enabled))                
         print('Aligned images: {0} '.format(counter))
-        logger.info(f'Enabled images: {n_enabled}, Aligned images: {counter}')
         opf.write('Enabled images: {0}\nAligned images: {1}\n'.format(n_enabled, counter)) 
         if n_enabled-counter==0:
             print('All enabled images aligned!')
-            logger.info('All enabled images aligned!')
         elif n_enabled-counter>0 and n_enabled-counter<=thresh_align:
             print(n_enabled-counter, 'enabled images did not align!')       
-            logger.warning(f'{n_enabled-counter} enabled images did not align!')
         elif n_enabled-counter>thresh_align:
             print('Try again or reevaluate the quality of corresponding photos') 
-            logger.error('Too many images did not align. Try again or reevaluate the quality of corresponding photos')
             quit()
              
         # save an original copy of the SPC in case you need to undo any point filtering 
@@ -236,13 +201,11 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         shutil.copytree(os.path.join(prod_path, folder_name+'.files'), 
                         os.path.join(prod_path, folder_name+'_bkup.files'))
     print("Step 2. Add and align photos finished ")                
-    logger.info("Step 2. Add and align photos finished ")
     #==============================================================================================  
+    ### 3) Sparse point cloud filtering
     print("Step 3. Sparse point cloud filtering")  
-    logger.info("Step 3. Sparse point cloud filtering")
     if start_step<=3 and end_step>=3:
         print('Step 3')
-        logger.info('Step 3')
         opf.write('\nSparse point cloud filtering\n{0}\n'.format(underline))
         
         keep_percent = 51
@@ -263,7 +226,6 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         target = int(len(list_values_valid) * keep_percent / 100)
         RecUncert = list_values_valid[target]
         print('Reconstruction Uncertainty threshold to keep 51%:', RecUncert)
-        logger.info(f'Reconstruction Uncertainty threshold to keep 51%: {RecUncert}')
         if RecUncert < 10:
             RecUncert = 10
             print('Reconstruction Uncertainty threshold set to', RecUncert)
@@ -285,7 +247,6 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         target = int(len(list_values_valid) * keep_percent / 100)
         ProjAcc = list_values_valid[target]
         print('Projection Accuracy threshold to keep 51%:', ProjAcc)
-        logger.info(f'Projection Accuracy threshold to keep 51%: {ProjAcc}')
         if ProjAcc < 2:
             ProjAcc = 2
             print('Projection Accuracy threshold set to', ProjAcc)
@@ -296,14 +257,12 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         chunk.optimizeCameras(tiepoint_covariance=True)
         doc.save()
     print("Step 3. Sparse point cloud filtering Finished")     
-    logger.info("Step 3. Sparse point cloud filtering Finished")
     #==============================================================================================
+    ### 4) Scaling
     print("Step 4. Scaling")  
-    logger.info("Step 4. Scaling")
     if start_step<=4 and end_step>=4:
         
         print('Step 4')
-        logger.info('Step 4')
         opf.write('\nScaling\n{0}\n'.format(underline))
                   
         # detect markers   
@@ -313,24 +272,20 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         # reduce marker list to valid markers     
         MarkersList = list(chunk.markers)
         print(MarkersList)
-        logger.info(f'MarkersList: {MarkersList}')
         for marker in MarkersList:
             print(underline, '\n', marker.label)
             if not marker:
                 print(marker.label + " not found, skipping...")
-                logger.warning(f'{marker.label} not found, skipping...')
                 MarkersList.remove(marker)
                 chunk.remove(marker)
                 continue
             if not marker.position:
                 print(marker.label + " is not defined in 3D, skipping...")
-                logger.warning(f'{marker.label} is not defined in 3D, skipping...')
                 MarkersList.remove(marker)
                 chunk.remove(marker)
                 continue            
             if marker.label not in valid_markers:
                 print(marker.label + " not a valid marker, skipping...")
-                logger.warning(f'{marker.label} not a valid marker, skipping...')
                 MarkersList.remove(marker)
                 chunk.remove(marker)
                 continue
@@ -360,7 +315,6 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
                     max_err = sorted(cam_err, key=lambda x: x[1], reverse=True)[0]
                     # print (sorted(cam_err, key=lambda x: x[1], reverse=True))
                     print('Removed:', max_err[0], max_err[1])
-                    logger.info(f'Removed {max_err[0]} with pix error {max_err[1]:.4}')
                     opf.write('Removed {0} with pix error {1:.4}\n'.format(
                               max_err[0], max_err[1]))
                     for camera in marker.projections.keys():
@@ -371,16 +325,13 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
             opf.write('Marker: {1}, projections: {2}, total error {3:.4f} pix\n{0}\n\n'.format(
                               underline, marker.label, len(cam_err), pix_error))
             print('Marker:', marker.label, len(cam_err), pix_error)
-            logger.info(f'Marker: {marker.label}, projections: {len(cam_err)}, total error {pix_error:.4f} pix')
         
         # check validity of marker (thanks GUA-2662)
         print(MarkersList)
-        logger.info(f'Final MarkersList: {MarkersList}')
         for marker in MarkersList:
             print(marker.label)
             if marker.label not in valid_markers:
                 print(marker.label + " not a valid marker, skipping 2...")
-                logger.warning(f'{marker.label} not a valid marker, skipping 2...')
                 MarkersList.remove(marker)
                 chunk.remove(marker)
                 continue
@@ -391,7 +342,6 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
             print(marker.label)
             if marker.label not in valid_markers:
                 print(marker.label + " not a valid marker, skipping 3...")
-                logger.warning(f'{marker.label} not a valid marker, skipping 3...')
                 MarkersList.remove(marker)
                 chunk.remove(marker)
                 continue
@@ -423,23 +373,19 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
                 dist_estimated = (scalebar.point0.position - scalebar.point1.position).norm() * chunk.transform.scale            
             dist_error = dist_estimated - dist_source
             print(scalebar.label, str(dist_source), str(dist_estimated), str(dist_error))
-            logger.info(f'Scalebar: {scalebar.label}, distance: {dist_source}, estimated distance: {dist_estimated}, error: {dist_error}')
             opf.write('Scalebar: {0}, distance: {1:.2f}, esimated distance: {2:.5f}, error: {3:.6f}\n'.format(
                               scalebar.label, dist_source, dist_estimated, dist_error))
             if dist_error>=0.002:
                 print('Scalebar error too high: lower error_thresh and run again starting at step 4!')
-                logger.warning('Scalebar error too high: lower error_thresh and run again starting at step 4!')
                 opf.write('Scalebar error too high: lower error_thresh and run again starting at step 4!\n')
             scalebar.reference.enabled = False
         doc.save()
     print("Step 4. Scaling Finished")          
-    logger.info("Step 4. Scaling Finished")
     #==============================================================================================
+    ### 5) Error reduction, part 2
     print("Step 5. Error reduction part 2")  
-    logger.info("Step 5. Error reduction part 2")
     if start_step<=5 and end_step>=5:
         print('Step 5')
-        logger.info('Step 5')
         opf.write('\nError Reduction\n{0}\n'.format(underline))
         points = chunk.tie_points.points
     
@@ -456,7 +402,6 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         target = int(len(list_values_valid) * keep_percent / 100)
         Rep_Err = list_values_valid[target]
         print('Reprojection Error threshold to keep 90%:', Rep_Err)
-        logger.info(f'Reprojection Error threshold to keep 90%: {Rep_Err}')
         opf.write('Reprojection Error threshold to keep 90%: {0:.2f}\n'.format(Rep_Err))
         f.removePoints(Rep_Err)        
         
@@ -464,13 +409,11 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         chunk.optimizeCameras() # Optimization will be based on estimated camera poses
         doc.save()
     print("Step 5. Error reduction part 2 Done")  
-    logger.info("Step 5. Error reduction part 2 Done")
     #==============================================================================================
+    ### 6) Build Dense Cloud
     print("Step 6.Build Dense Cloud")  
-    logger.info("Step 6.Build Dense Cloud")
     if start_step<=6 and end_step>=6:
         print('Step 6')
-        logger.info('Step 6')
         # buildDepthMaps(downscale=4, filter_mode=MildFiltering[, cameras ], reuse_depth=False,
         # max_neighbors=40, subdivide_task=True, workitem_size_cameras=20,
         # max_workgroup_size=100[, progress ])
@@ -494,14 +437,12 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
         # DONE MANUALLY (for now, could easily be read from the processing log)
         
         doc.save()
-    print("Step 6.Build Dense Cloud complete")
-    logger.info("Step 6.Build Dense Cloud complete")
+    print("Step 6.Build Dense Cloud complete") 
     #==============================================================================================
+   ### 7) Build and export DEM and Orthomosaic, generate report
     print("Step 7. Build and export DEM and Orthomosaic and generate report")  
-    logger.info("Step 7. Build and export DEM and Orthomosaic and generate report")
     if start_step==7:
         print('Step 7')
-        logger.info('Step 7')
         
         # make ARC directory
         arc_path = os.path.join(prod_path, 'ARC')
@@ -586,7 +527,6 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
             outputs[key] = {'path' : path, 'center' : center, 'transform' : trans}
             
         print(outputs)
-        logger.info(f'Camera outputs: {outputs}')
         meta_file.write(json.dumps({'cameras' : outputs}, indent=4))
         meta_file.close()
         
@@ -602,9 +542,7 @@ def MetashapeProcess(root_path, folder_name, start_step=1, end_step=7,
     doc.save()
     opf.close()
     print("Step 7. Build and export DEM and Orthomosaic and generate report Complete")  
-    logger.info("Step 7. Build and export DEM and Orthomosaic and generate report Complete")
     print('Finished processing: ', folder_name)
-    logger.info(f'Finished processing: {folder_name}')
 
 ###################################################################################################   
 # open processing log and execute MetashapeProcess function
@@ -616,7 +554,6 @@ if __name__ == "__main__":
             if col[2]==str(batch_no): # number of batch to be processed
                 fpath = r''+col[0] # read project filepath
                 print(fpath)
-                logger.info(f'Processing project at path: {fpath}')
                 if os.path.exists(fpath):
                     quality_thres = float(col[9]) # image quality threshold 
                     sur_year = str(col[10]) # survey year for export
@@ -630,4 +567,3 @@ if __name__ == "__main__":
                                      valid_markers=ml, quality=quality_thres, survey_year=sur_year)
                 else:
                     print(fpath, 'does not exist, move to next project!')
-                    logger.warning(f'{fpath} does not exist, moving to next project!')

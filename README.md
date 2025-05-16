@@ -2,6 +2,8 @@
 
 These scripts automate the batch processing of georeferenced, time-series coral reef photomosaics using Agisoft Metashape. They follow a Structure-from-Motion (SfM) workflow to generate 3D models and mosaics from photographic images of coral reefs, streamlining the processing pipeline for efficient monitoring and analysis.
 
+<img src="./docs/s02.png" />
+
 ## Features
 - **Batch Processing:** Automates the full SfM workflow for multiple sites or datasets.
 - **Photo Management:** Reads and validates image files from user-specified directories.
@@ -11,8 +13,6 @@ These scripts automate the batch processing of georeferenced, time-series coral 
 - **Export:** Generates and exports DEMs, orthomosaics, and processing reports.
 - **Logging:** Logs all processing steps and results for reproducibility and troubleshooting.
 - **Compatibility:** Two script versions for legacy and current Metashape Python APIs.
-
-<img src="./docs/s01.png" />
 
 ## Overview
 
@@ -88,6 +88,10 @@ This repository includes two main batch processing scripts for Agisoft Metashape
    python SfMBatchProcess_v2.py
    ```
    (or `SfMBatchProcess_v1.py` for legacy workflows)
+
+
+## App (work-in-progress)
+<img src="./docs/s01.png" />
 
 ## References
 - [Agisoft Metashape Python API Documentation](https://www.agisoft.com/pdf/metashape_python_api_2_0_0.pdf)

@@ -1,0 +1,38 @@
+--------------------------------------------------------
+--  DDL for View V_SFM_JOB_STATS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE VIEW "V_SFM_JOB_STATS" ("JOB_ID", "SFMMETAID", "SITE", "STATUS", "STARTED_AT", "COMPLETED_AT", "DURATION_HOURS", "ERROR_COUNT", "WARNING_COUNT") AS SELECT
+    p.JOB_ID,
+    sm.SFMMETAID,
+    CASE
+    WHEN sv.type = 'Oceanography' then sv.SITE
+    ELSE sv.OCC_SITEID
+    END AS SITE,
+   -- p.BATCH_ID,
+    -- sb.BATCH_NAME,
+    p.STATUS,
+    p.STARTED_AT,
+    p.COMPLETED_AT,
+    ROUND((CAST(p.COMPLETED_AT AS DATE) - CAST(p.STARTED_AT AS DATE)) * 24, 2) AS DURATION_HOURS,
+    
+    CASE 
+        WHEN p.STATUS = 'FAILED' AND p.ERROR_MESSAGE IS NOT NULL THEN 1
+        ELSE 0
+    END AS ERROR_COUNT,
+    
+    CASE 
+        WHEN p.STATUS != 'FAILED' AND p.ERROR_MESSAGE IS NOT NULL THEN 1
+        ELSE 0
+    END AS WARNING_COUNT
+
+FROM
+    SFM_PROCESSING_JOBS p
+JOIN
+    SFM_METADATA sm ON p.SFMMETAID = sm.SFMMETAID
+JOIN
+    SITE_VISIT sv ON sm.SITEVISITID = sv.SITEVISITID
+--JOIN SFM_BATCHES sb ON p.BATCH_ID = sb.BATCH_ID
+WHERE
+    p.STARTED_AT IS NOT NULL
+    AND p.COMPLETED_AT IS NOT NULL

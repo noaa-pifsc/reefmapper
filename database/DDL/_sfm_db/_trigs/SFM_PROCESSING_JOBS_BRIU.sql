@@ -1,0 +1,12 @@
+--------------------------------------------------------
+--  DDL for Trigger SFM_PROCESSING_JOBS_BRIU
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE TRIGGER "SFM_PROCESSING_JOBS_BRIU" 
+BEFORE UPDATE ON SFM_PROCESSING_JOBS
+FOR EACH ROW
+BEGIN 
+  :NEW.UPDATED_AT := SYSDATE;
+END;
+
+ALTER TRIGGER "SFM_PROCESSING_JOBS_BRIU" ENABLE

@@ -1,0 +1,67 @@
+
+
+-- Create sequence for job IDs
+CREATE SEQUENCE sfm_job_seq START WITH 1 INCREMENT BY 1;
+
+-- Create sequence for log entries
+CREATE SEQUENCE sfm_log_seq START WITH 1 INCREMENT BY 1;
+
+-- Create sequence for batch IDs
+CREATE SEQUENCE sfm_batch_seq START WITH 1 INCREMENT BY 1;
+
+-- Create Batches table
+CREATE TABLE SFM_BATCHES (
+    BATCH_ID NUMBER DEFAULT sfm_batch_seq.NEXTVAL PRIMARY KEY,
+    BATCH_NAME VARCHAR2(100) NOT NULL,
+    DESCRIPTION VARCHAR2(4000),
+    CREATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    STATUS VARCHAR2(50) DEFAULT 'pending' NOT NULL,
+    CONSTRAINT sfm_batches_status_chk CHECK (status IN ('pending', 'processing', 'completed', 'failed'))
+);
+
+
+CREATE TABLE SFM_PROCESSING_JOBS (
+    JOB_ID NUMBER DEFAULT sfm_job_seq.NEXTVAL PRIMARY KEY,
+    BATCH_ID NUMBER NOT NULL,
+    SFMMETAID NUMBER NOT NULL,
+    PROJECT_PATH VARCHAR2(500) NOT NULL,
+    START_STEP NUMBER DEFAULT 1 NOT NULL,
+    END_STEP NUMBER DEFAULT 7 NOT NULL,
+    QUALITY NUMBER(4,3) DEFAULT 0.5 NOT NULL,
+    SURVEY_YEAR VARCHAR2(4) NOT NULL,
+    PRIORITY NUMBER(3) DEFAULT 1 NOT NULL,
+    STATUS VARCHAR2(50) DEFAULT 'pending' NOT NULL,
+    ERROR_MESSAGE VARCHAR2(4000),
+    CREATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    STARTED_AT TIMESTAMP,
+    COMPLETED_AT TIMESTAMP,
+    CONSTRAINT sfm_jobs_batch_fk FOREIGN KEY (batch_id) REFERENCES SFM_BATCHES(batch_id),
+    CONSTRAINT sfm_jobs_meta_fk FOREIGN KEY (sfmmetaid) REFERENCES SFM_METADATA(sfmmetaid),
+    CONSTRAINT sfm_jobs_step_range_chk CHECK (start_step BETWEEN 1 AND 7),
+    CONSTRAINT sfm_jobs_steps_order_chk CHECK (end_step >= start_step),
+    CONSTRAINT sfm_jobs_end_step_chk CHECK (end_step BETWEEN 1 AND 7),
+    CONSTRAINT sfm_jobs_quality_chk CHECK (quality BETWEEN 0 AND 1),
+    CONSTRAINT sfm_jobs_status_chk CHECK (status IN ('pending', 'running', 'completed', 'failed'))
+);
+
+-- Create Processing Logs table
+CREATE TABLE SFM_PROCESSING_LOGS (
+    LOG_ID NUMBER DEFAULT sfm_log_seq.NEXTVAL PRIMARY KEY,
+    JOB_ID NUMBER NOT NULL,
+    STEP_NUM NUMBER NOT NULL,
+    STEP_NAME VARCHAR2(100) NOT NULL,
+    STATUS VARCHAR2(50) NOT NULL,
+    MESSAGE VARCHAR2(4000),
+    TIMESTAMP TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT sfm_logs_job_fk FOREIGN KEY (job_id) REFERENCES SFM_PROCESSING_JOBS(job_id),
+    CONSTRAINT sfm_logs_step_chk CHECK (step_num BETWEEN -1 AND 7),
+    CONSTRAINT sfm_logs_status_chk CHECK (status IN ('started', 'running', 'completed', 'failed', 'warning', 'error', 'info'))
+);
+
+CREATE INDEX idx_sfm_jobs_status ON SFM_PROCESSING_JOBS(status, priority);
+CREATE INDEX idx_sfm_jobs_batch ON SFM_PROCESSING_JOBS(batch_id);
+CREATE INDEX idx_sfm_jobs_meta ON SFM_PROCESSING_JOBS(sfmmetaid);
+CREATE INDEX idx_sfm_logs_job ON SFM_PROCESSING_LOGS(job_id);
+CREATE INDEX idx_sfm_logs_timestamp ON SFM_PROCESSING_LOGS(timestamp);

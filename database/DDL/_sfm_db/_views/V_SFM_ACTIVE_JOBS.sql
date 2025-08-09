@@ -1,0 +1,28 @@
+--------------------------------------------------------
+--  DDL for View V_SFM_ACTIVE_JOBS
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE VIEW "V_SFM_ACTIVE_JOBS" ("SITE", "SFMMETAID", "JOB_ID", "BATCH_ID", "BATCH_NAME", "STATUS", "STARTED_AT", "CURRENT_TIME", "RUNNING_HOURS") AS SELECT
+    CASE
+    WHEN sv.type = 'Oceanography' then sv.SITE
+    ELSE sv.OCC_SITEID
+    END AS SITE,
+    sm.SFMMETAID,
+    p.JOB_ID,
+    p.BATCH_ID,
+    sb.BATCH_NAME,
+    p.STATUS,
+    p.STARTED_AT,
+    SYSDATE AS CURRENT_TIME,
+ROUND((SYSDATE - CAST(p.STARTED_AT AS DATE)) * 24, 2) AS RUNNING_HOURS
+FROM
+    SITE_VISIT sv
+JOIN
+    SFM_METADATA sm ON sv.SITEVISITID = sm.SITEVISITID
+JOIN
+    SFM_PROCESSING_JOBS p ON sm.SFMMETAID = p.SFMMETAID
+JOIN
+    SFM_BATCHES sb ON p.BATCH_ID = sb.BATCH_ID
+WHERE
+    p.STATUS = 'RUNNING'
+    AND p.STARTED_AT IS NOT NULL

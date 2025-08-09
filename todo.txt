@@ -1,0 +1,7 @@
+-- update db_manager.py with testing_db_logging.py (import oracledb fucntions)
+-- modularize / separate out steps into different python files for better management
+-- improve logging
+-- pip uninstall cxOracle dotenv 
+
+-- need way to assign survey_year, site_id in database before running 
+-- needs to log start step and end step

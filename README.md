@@ -104,6 +104,34 @@ This repository includes three versions of the batch processing scripts for Agis
 - Exported DEMs, orthomosaics, and reports (in supported formats).
 
 
+
+## Modularization Development
+
+### `sfm_metashape_main.py`
+- **Description:** Defines the actual Metashape processing function MetashapeProcess
+- **Key Features:**
+  - It opens or creates .psx
+  - loops through steps
+  - calls run_step().
+
+### `db_manager_mod.py`
+- **Description:** Connects to Oracle DB, pulls values from database e.g. marker and sfmmetaid. Defines functions that do database updates i.e. `def get_step_status`, `def set_start_step`,  `log_step(job_id, step_number, status, message)`
+
+
+### `metashape_runner.py`
+- **Description:** Open DB, get pending jobs, call MetashapeProcess for each, close DB on exit
+
+### `steps/step_XX.py`
+- **Description:** Each step separated out into a .py file and calls `def run(job, doc, chunk, db, logger, opf):`
+
+
+### `steps/__init__.py`
+- **Description:** Handles `run_step(step_number, job, doc, chunk, db, logger, opf)`
+ Dynamically loads `steps/step_0X.py` using `importlib`, then calls its `run()` function.
+
+
+
+
 ## Quick Start
 
 ### For CSV-based Processing (v1/v2)

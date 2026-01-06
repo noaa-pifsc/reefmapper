@@ -91,6 +91,16 @@ This repository includes three versions of the batch processing scripts for Agis
   - Comprehensive processing statistics
 - **Usage:** Recommended for production environments and large-scale processing.
 
+### `SfMBatchProcess_v3.py`
+- **Description:** Singular script that iterates through steps 1-7 no stopping
+- **Usage:** Reference.
+
+### `sfm_metashape_main.py`
+- **Description:** Modularized main script that works with steps in steps folder.
+- **Usage:** Launch with .bat script and manage via Optical App.
+
+
+
 ## Inputs & Outputs
 
 **Inputs:**

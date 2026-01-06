@@ -1,6 +1,9 @@
 .env
+.env.old
 *.pyc
 __pycache__/
 .pytest_cache/
 *.log
 database/*.db
+.bat
+*.bat

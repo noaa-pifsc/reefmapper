@@ -1,11 +1,11 @@
 import oracledb
 from typing import Optional, List, Union
 from dataclasses import dataclass
-import os
-import sqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 from pathlib import Path
+import os
+import sqlite3
 
 @dataclass
 class ProcessingJob:
@@ -24,11 +24,20 @@ class ProcessingJob:
     marker_pair2: Optional[str] = None
     marker_pair3: Optional[str] = None
     marker_pair4: Optional[str] = None
-    marker_pair1_depth: Optional[int] = None
-    marker_pair2_depth: Optional[int] = None
-    marker_pair3_depth: Optional[int] = None
-    marker_pair4_depth: Optional[int] = None
+    output_log_path: Optional[str] = None
 
+
+def normalize_path(path: str) -> str:
+    """
+    Ensure paths are absolute and mapped drives are replaced with UNC equivalents.
+    Customize the drive_map dict for your environment.
+    """
+    if not path:
+        return path
+
+    abs_path = os.path.abspath(path)
+
+    return abs_path
 
 class MyDatabaseManager:
     def __init__(self):
@@ -86,7 +95,7 @@ class MyDatabaseManager:
                 self.conn.close()
     
     def get_pending_jobs(self) -> List[ProcessingJob]:
-        """Get all pending jobs ordered by priority and creation time."""
+        """Get all pending jobs ordered by priority"""
         conn = self.connect()
         try:
             cur = conn.cursor()
@@ -107,18 +116,13 @@ class MyDatabaseManager:
                     sm.MARKER_0M_NUMBERS as marker_pair1,
                     sm.MARKER_5M_NUMBERS as marker_pair2,
                     sm.MARKER_10M_NUMBERS as marker_pair3,
-                    sm.MARKER_15M_NUMBERS as marker_pair4,
-                    sm.MARKER_0M_DEPTH_FT  as marker_pair1_depth,
-                    sm.MARKER_5M_DEPTH_FT  as marker_pair2_depth,
-                    sm.MARKER_10M_DEPTH_FT  as marker_pair3_depth,
-                    sm.MARKER_15M_DEPTH_FT  as marker_pair4_depth
+                    sm.MARKER_15M_NUMBERS as marker_pair4
                     FROM SFM_PROCESSING_JOBS pj
                     JOIN sfm_metadata sm ON sm.sfmmetaid = pj.sfmmetaid
                     WHERE pj.status in ('pending')
-                    AND pj.priority IS NOT NULL
-                    and pj.end_step <> 7
+                    and pj.end_step <> 7 and pj.priority IS NOT NULL
                     ORDER BY pj.priority ASC
-                    FETCH FIRST 1 ROWS ONLY
+
                 """
                 cur.execute(query)
             else:
@@ -138,25 +142,34 @@ class MyDatabaseManager:
                     sm.MARKER_0M_NUMBERS as marker_pair1,
                     sm.MARKER_5M_NUMBERS as marker_pair2,
                     sm.MARKER_10M_NUMBERS as marker_pair3,
-                    sm.MARKER_15M_NUMBERS as marker_pair4,
-                    sm.MARKER_0M_DEPTH_FT  as marker_pair1_depth,
-                    sm.MARKER_5M_DEPTH_FT  as marker_pair2_depth,
-                    sm.MARKER_10M_DEPTH_FT  as marker_pair3_depth,
-                    sm.MARKER_15M_DEPTH_FT  as marker_pair4_depth
+                    sm.MARKER_15M_NUMBERS as marker_pair4
                     FROM SFM_PROCESSING_JOBS pj
                     JOIN sfm_metadata sm ON sm.sfmmetaid = pj.sfmmetaid
                     WHERE pj.status in ('pending')
-                    AND pj.priority IS NOT NULL
-                    and pj.end_step <> 7
+                    and pj.end_step <> 7 and pj.priority IS NOT NULL
                     ORDER BY pj.priority ASC
-                    FETCH FIRST 1 ROWS ONLY
                 """
                 cur.execute(query)
 
             jobs = []
             for row in cur.fetchall():
-                jobs.append(ProcessingJob(*row))
+                job = ProcessingJob(*row)
+
+                # normalize key file paths
+                job.project_path = normalize_path(job.project_path)
+
+                # If the DB includes an output_log_path column use it; otherwise ensure attribute exists
+                raw_log = getattr(job, "output_log_path", None)
+                if raw_log:
+                    job.output_log_path = normalize_path(raw_log)
+                else:
+                    # create attribute for downstream code that expects it
+                    job.output_log_path = None
+
+                jobs.append(job)
+
             return jobs
+                        
         finally:
             if self.use_oracle:
                 self._release_connection(conn)
@@ -282,24 +295,6 @@ class MyDatabaseManager:
             self.oracle_pool.close()
         if hasattr(self, 'conn'):
             self.conn.close()
-
-    def update_priority (self, job_id: int, value: Optional[int]):
-        conn = self.connect()
-        try:
-            cur = conn.cursor()
-            if self.use_oracle:
-                query = "UPDATE SFM_PROCESSING_JOBS SET priority = :1 WHERE job_id = :2"
-                cur.execute(query, (value, job_id))
-            else:
-                query = "UPDATE SFM_PROCESSING_JOBS SET priority = ? WHERE job_id = ?"
-                cur.execute(query, (value, job_id))
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            raise
-        finally:
-            if self.use_oracle:
-                self._release_connection(conn)
 
     def get_step_status(self, job_id: int, step_num: int) -> str:
         conn = self.connect()

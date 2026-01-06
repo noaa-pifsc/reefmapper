@@ -1,0 +1,14 @@
+####################################################################
+####################################################################
+# SETTING UP SFM MACHINE
+###################################################################
+##################################################################
+# in Anaconda Prompt install libraries (call Metashape's python module)
+##################################################################
+"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install html2text
+
+"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install oracledb
+
+## Install oracle Instant client 21_19 to oracle folder on C drive -- create 'oracle' folder then extract files to C:\oracle\
+
+"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install python-dotenv

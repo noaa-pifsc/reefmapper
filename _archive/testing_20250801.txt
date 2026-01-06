@@ -1,0 +1,130 @@
+#########################
+#########################
+SETTING UP SFM MACHINE
+########################
+#######################
+# in Anaconda Prompt
+"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install html2text
+
+"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install oracledb
+
+### Install oracle Instant client 21_19 to oracle folder on C drive (extract files here)
+
+"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install python-dotenv
+# this may rqeuire downloading Microsoft C++ Build Tools
+
+###########################################
+##########################################
+
+In Metashape go to Tools > Run Script -- launch Metashape using .bat that launches it with thick oracle
+
+DPI-1047: Cannot locate a 64-bit Oracle Client library: "The specified module could not be found".
+# Need to get Oracle installed
+#installed OIC , create .bat file to launch metashape with oracle in path
+
+@echo off
+set PATH=C:\oracle\instantclient_21_19;%PATH%
+start "" "C:\Program Files\Agisoft\Metashape Pro\metashape.exe"
+
+# Had incorrect DB user / password so launched Metashapes'python using similar bat script to call path
+# test username/password/DNS
+ cx_Oracle
+cx_Oracle.connect("gisdat", "", "picdb-dev.nmfs.local:1521/gisd.pifscdevdbsn.pifscdevvcn.oraclevcn.com")
+
+
+# Results
+(base) C:\Users\PICHLMRUser\Desktop\reefmapper>"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install html2text
+Defaulting to user installation because normal site-packages is not writeable
+Collecting html2text
+  Downloading html2text-2025.4.15-py3-none-any.whl (34 kB)
+Installing collected packages: html2text
+  WARNING: The script html2text.exe is installed in 'C:\Users\PICHLMRUser\AppData\Roaming\Python\Python39\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed html2text-2025.4.15
+
+[notice] A new release of pip available: 22.2.2 -> 25.2
+[notice] To update, run: C:\Program Files\Agisoft\Metashape Pro\python\python.exe -m pip install --upgrade pip
+
+(base) C:\Users\PICHLMRUser\Desktop\reefmapper>"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install cx-Oracle python-dotenv
+Defaulting to user installation because normal site-packages is not writeable
+Collecting cx-Oracle
+  Downloading cx_Oracle-8.3.0-cp39-cp39-win_amd64.whl (213 kB)
+     ---------------------------------------- 213.2/213.2 kB 1.1 MB/s eta 0:00:00
+Collecting python-dotenv
+  Downloading python_dotenv-1.1.1-py3-none-any.whl (20 kB)
+Installing collected packages: cx-Oracle, python-dotenv
+  WARNING: The script dotenv.exe is installed in 'C:\Users\PICHLMRUser\AppData\Roaming\Python\Python39\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed cx-Oracle-8.3.0 python-dotenv-1.1.1
+
+[notice] A new release of pip available: 22.2.2 -> 25.2
+[notice] To update, run: C:\Program Files\Agisoft\Metashape Pro\python\python.exe -m pip install --upgrade pip
+
+
+
+
+
+
+# 20250804
+
+# pip uninstall cx_Oracle - updated db_manager.py to pull from oracledb and pip install oracledb
+
+Launch Metashape python with .bat
+"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install oracledb
+
+(base) C:\Users\PICHLMRUser>pip uninstall cx_Oracle
+Found existing installation: cx_Oracle 8.3.0
+Uninstalling cx_Oracle-8.3.0:
+  Would remove:
+    c:\users\pichlmruser\appdata\local\anaconda3\cx_oracle-doc\license.txt
+    c:\users\pichlmruser\appdata\local\anaconda3\cx_oracle-doc\readme.txt
+    c:\users\pichlmruser\appdata\local\anaconda3\lib\site-packages\cx_oracle-8.3.0.dist-info\*
+    c:\users\pichlmruser\appdata\local\anaconda3\lib\site-packages\cx_oracle.cp312-win_amd64.pyd
+Proceed (Y/n)? t
+Your response ('t') was not one of the expected responses: y, n,
+Proceed (Y/n)? y
+  Successfully uninstalled cx_Oracle-8.3.0
+
+(base) C:\Users\PICHLMRUser>pip install oracledb
+Collecting oracledb
+  Downloading oracledb-3.3.0-cp312-cp312-win_amd64.whl.metadata (6.9 kB)
+Requirement already satisfied: cryptography>=3.2.1 in c:\users\pichlmruser\appdata\local\anaconda3\lib\site-packages (from oracledb) (43.0.0)
+Requirement already satisfied: cffi>=1.12 in c:\users\pichlmruser\appdata\local\anaconda3\lib\site-packages (from cryptography>=3.2.1->oracledb) (1.17.1)
+Requirement already satisfied: pycparser in c:\users\pichlmruser\appdata\local\anaconda3\lib\site-packages (from cffi>=1.12->cryptography>=3.2.1->oracledb) (2.21)
+Downloading oracledb-3.3.0-cp312-cp312-win_amd64.whl (1.8 MB)
+   ---------------------------------------- 1.8/1.8 MB 3.6 MB/s eta 0:00:00
+Installing collected packages: oracledb
+Successfully installed oracledb-3.3.0
+
+
+
+(base) C:\Users\PICHLMRUser>pip uninstall oracledb
+Found existing installation: oracledb 3.3.0
+Uninstalling oracledb-3.3.0:
+  Would remove:
+    c:\users\pichlmruser\appdata\local\anaconda3\lib\site-packages\oracledb-3.3.0.dist-info\*
+    c:\users\pichlmruser\appdata\local\anaconda3\lib\site-packages\oracledb\*
+Proceed (Y/n)? y
+  Successfully uninstalled oracledb-3.3.0
+
+(base) C:\Users\PICHLMRUser>"C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install oracledb
+Defaulting to user installation because normal site-packages is not writeable
+Collecting oracledb
+  Downloading oracledb-3.3.0-cp39-cp39-win_amd64.whl (1.8 MB)
+     ---------------------------------------- 1.8/1.8 MB 3.8 MB/s eta 0:00:00
+Collecting cryptography>=3.2.1
+  Downloading cryptography-45.0.5-cp37-abi3-win_amd64.whl (3.4 MB)
+     ---------------------------------------- 3.4/3.4 MB 14.4 MB/s eta 0:00:00
+Collecting cffi>=1.14
+  Downloading cffi-1.17.1-cp39-cp39-win_amd64.whl (181 kB)
+     ---------------------------------------- 181.3/181.3 kB 11.4 MB/s eta 0:00:00
+Collecting pycparser
+  Downloading pycparser-2.22-py3-none-any.whl (117 kB)
+     ---------------------------------------- 117.6/117.6 kB 7.2 MB/s eta 0:00:00
+Installing collected packages: pycparser, cffi, cryptography, oracledb
+Successfully installed cffi-1.17.1 cryptography-45.0.5 oracledb-3.3.0 pycparser-2.22
+
+[notice] A new release of pip available: 22.2.2 -> 25.2
+[notice] To update, run: C:\Program Files\Agisoft\Metashape Pro\python\python.exe -m pip install --upgrade pip
+
+(base) C:\Users\PICHLMRUser>

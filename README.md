@@ -439,9 +439,10 @@ Once your site visit and metadata records are created and reviewed, you control 
 - Validate marker numbers, depths, file paths, and survey details.
 
 ### 2. Create Processing Jobs
-- Insert new jobs into `SFM_PROCESSING_JOBS` for each site/survey you want to process.
-- Set `status` to `'pending'` for jobs you want to run.
-- Example:
+- Once image QC  has been marked in the Optical App, a record will be created in `SFM_PROCESSING_JOBS` for each site/survey you want to process.
+- Set the priority as a number for the order in which you'd like them to run. Once priority is saved, the status will be updated to `'pending'`.
+
+- Manual Example:
   ```sql
   INSERT INTO SFM_PROCESSING_JOBS (
       batch_id, sfmmetaid, project_path, start_step, end_step, quality, survey_year, priority, status
